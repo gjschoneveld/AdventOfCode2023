@@ -35,13 +35,11 @@ void FindAdjacentPartNumbers(Schematic schematic)
 
     foreach (var symbol in symbols)
     {
-        foreach (var neighbour in Neighbours(symbol.Position))
-        {
-            if (schematic.TryGetValue(neighbour, out Item? item) && item is PartNumber number)
-            {
-                symbol.AdjacentPartNumbers.Add(number);
-            }
-        }
+        symbol.AdjacentPartNumbers = Neighbours(symbol.Position)
+            .Where(schematic.ContainsKey)
+            .Select(nb => schematic[nb])
+            .OfType<PartNumber>()
+            .ToHashSet();
     }
 }
 
