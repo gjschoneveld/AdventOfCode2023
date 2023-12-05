@@ -1,5 +1,4 @@
-﻿using System.Net.Sockets;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 var input = File.ReadAllLines("input.txt");
 var seeds = ParseSeeds(input[0]);
