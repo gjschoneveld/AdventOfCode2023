@@ -85,7 +85,7 @@ class Map
     {
         var start = range.Start;
 
-        while (true)
+        while (start < range.End)
         {
             var line = NextLine(start);
 
@@ -125,12 +125,6 @@ class Map
             }
 
             start = line.SourceEnd;
-
-            if (start >= range.End)
-            {
-                // we have reached the end
-                yield break;
-            }
         }
     }
 
