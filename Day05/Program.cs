@@ -102,7 +102,7 @@ class Map
 
             if (start < line.SourceStart)
             {
-                // found some stuff before the next line
+                // return stuff before the next line
                 yield return new Range
                 {
                     Start = start,
