@@ -101,7 +101,7 @@ class Map
                 yield break;
             }
 
-            if (line.SourceStart > start)
+            if (start < line.SourceStart)
             {
                 // found some stuff before the next line
                 yield return new Range
