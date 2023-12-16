@@ -7,21 +7,14 @@ var lengthY = input.Length;
 var answer1 = EnergizeTiles(input, new() { Position = (0, 0), Direction = Direction.Right });
 Console.WriteLine($"Answer 1: {answer1}");
 
-var max = 0;
+List<Step> starts = [
+    .. Enumerable.Range(0, lengthX).Select(x => new Step { Position = (x, 0), Direction = Direction.Down }),
+    .. Enumerable.Range(0, lengthX).Select(x => new Step { Position = (x, lengthY - 1), Direction = Direction.Up }),
+    .. Enumerable.Range(0, lengthY).Select(y => new Step { Position = (0, y), Direction = Direction.Right }),
+    .. Enumerable.Range(0, lengthY).Select(y => new Step { Position = (lengthX - 1, y), Direction = Direction.Left })
+];
 
-for (int x = 0; x < lengthX; x++)
-{
-    max = Math.Max(max, EnergizeTiles(input, new() { Position = (x, 0), Direction = Direction.Down }));
-    max = Math.Max(max, EnergizeTiles(input, new() { Position = (x, lengthY - 1), Direction = Direction.Up }));
-}
-
-for (int y = 0; y < lengthX; y++)
-{
-    max = Math.Max(max, EnergizeTiles(input, new() { Position = (0, y), Direction = Direction.Right }));
-    max = Math.Max(max, EnergizeTiles(input, new() { Position = (lengthX - 1, y), Direction = Direction.Left }));
-}
-
-var answer2 = max;
+var answer2 = starts.Max(s => EnergizeTiles(input, s));
 Console.WriteLine($"Answer 2: {answer2}");
 
 int EnergizeTiles(string[] input, Step start)
