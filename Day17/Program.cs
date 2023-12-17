@@ -161,6 +161,6 @@ class State
 {
     public Point Position { get; set; }
     public Direction Direction { get; set; } = Direction.None;
-    public int StepsInDirection = 1;
+    public int StepsInDirection { get; set; }
     public int HeatLoss { get; set; }
 }
