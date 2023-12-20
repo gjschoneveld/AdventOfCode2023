@@ -1,6 +1,5 @@
 ﻿using Position = (int x, int y);
 using Direction = char;
-using System.Drawing;
 
 var input = File.ReadAllLines("input.txt");
 var lines = input.Select(Line.Parse).ToList();
