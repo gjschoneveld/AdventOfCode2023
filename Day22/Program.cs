@@ -112,7 +112,7 @@ class Brick
         Point delta = (Math.Sign(end.x - start.x), Math.Sign(end.y - start.y), Math.Sign(end.z - start.z));
 
         var position = start;
-        var result = new List<Point> {  start };
+        var result = new List<Point> { start };
 
         while (position != end)
         {
