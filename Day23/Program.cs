@@ -91,7 +91,7 @@ int? LongestPath(Dictionary<int, List<Vertex>> vertices, HashSet<int> visited, i
 
     var innerPaths = vertices[current]
         .Where(v => !visited.Contains(v.end))
-        .Select(nb => LongestPath(vertices, visited, nb.end, end) + nb.length)
+        .Select(v => LongestPath(vertices, visited, v.end, end) + v.length)
         .Where(p => p != null)
         .Select(p => p!.Value)
         .ToList();
