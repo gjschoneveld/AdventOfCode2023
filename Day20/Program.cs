@@ -29,7 +29,9 @@ Console.WriteLine($"Answer 1: {answer1}");
 // rx is low when all these are low
 // these are low periodic, so rx will be low
 // if we take the least common multiple
-List<string> targets = ["rk", "cd", "zf", "qx"];
+var targetModule = (Conjunction)modules.First(kv => kv.Value.Destinations.Contains("rx")).Value;
+var targets = targetModule.Inputs.Select(kv => kv.Key).ToList();
+
 var values = new Dictionary<string, int>();
 
 while (true)
@@ -176,7 +178,7 @@ class FlipFlop : Module
 
 class Conjunction : Module
 {
-    private Dictionary<string, bool> inputs { get; set; } = [];
+    public Dictionary<string, bool> Inputs { get; set; } = [];
 
     public override void Initialize(Dictionary<string, Module> modules)
     {
@@ -184,16 +186,16 @@ class Conjunction : Module
         {
             if (module.Destinations.Contains(Name))
             {
-                inputs.Add(name, false);
+                Inputs.Add(name, false);
             }
         }
     }
 
     public override List<Pulse> Process(Pulse pulse)
     {
-        inputs[pulse.Source] = pulse.Value;
+        Inputs[pulse.Source] = pulse.Value;
 
-        var result = !inputs.Values.All(v => v);
+        var result = !Inputs.Values.All(v => v);
 
         return Send(result);
     }
