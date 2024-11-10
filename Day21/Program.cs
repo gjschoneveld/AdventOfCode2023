@@ -8,12 +8,14 @@ var start = FindOfType(input, 'S').First();
 var answer1 = Simulate(64);
 Console.WriteLine($"Answer 1: {answer1}");
 
-List<int> totalSteps = [6, 10, 50, 100, 500, 1000, 5000];// 26501365;
+//for (int steps = 65; steps < 262 * 50; steps += 262)
+//{
+//    Console.WriteLine($"{steps}: {Simulate(steps)}");
+//    Console.WriteLine($"{steps}: {SimulateMany(steps)}");
+//}
 
-foreach (var steps in totalSteps)
-{
-    Console.WriteLine($"{steps}: {SimulateMany(steps)}");
-}
+var answer2 = SimulateMany(26501365);
+Console.WriteLine($"Answer 2: {answer2}");
 
 long SimulateMany(int steps)
 {
