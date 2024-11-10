@@ -14,6 +14,13 @@ Console.WriteLine($"Answer 1: {answer1}");
 //    Console.WriteLine($"{steps}: {SimulateMany(steps)}");
 //}
 
+// To test examples
+//foreach (var steps in new List<int> { 6, 10, 50, 100, 500, 1000, 5000 })
+//{
+//    Console.WriteLine($"{steps}: {Simulate(steps)}");
+//    Console.WriteLine($"{steps}: {SimulateMany(steps)}");
+//}
+
 var answer2 = SimulateMany(26501365);
 Console.WriteLine($"Answer 2: {answer2}");
 
