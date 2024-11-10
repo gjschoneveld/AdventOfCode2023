@@ -76,7 +76,7 @@ int Simulate(int steps)
         visited.UnionWith(toVisit);
     }
 
-    return visited.Select(p => p.x + p.y).Where(v => v % 2 == steps % 2).Count();
+    return visited.Count(p => (p.x + p.y) % 2 == steps % 2);
 }
 
 int Modulo(int x, int mod)
