@@ -59,6 +59,34 @@ long SimulateMany(int steps)
     return value;
 }
 
+void Print(HashSet<Point> visited)
+{
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            if (rocks.Contains((x, y)))
+            {
+                Console.Write("#");
+            }
+            else if (visited.Contains((x, y)))
+            {
+                Console.Write("O");
+            }
+            else if (start == (x, y))
+            {
+                Console.Write("S");
+            }
+            else
+            {
+                Console.Write(".");
+            }
+        }
+
+        Console.WriteLine();
+    }
+}
+
 int Simulate(int steps)
 {
     var toVisit = new List<Point> { start };
@@ -66,6 +94,9 @@ int Simulate(int steps)
 
     for (int i = 0; i < steps; i++)
     {
+        //Console.WriteLine($"{i}: {visited.Count(p => (p.x + p.y) % 2 == i % 2)}");
+        //Print(visited.Where(p => (p.x + p.y) % 2 == i % 2).ToHashSet());
+
         toVisit = toVisit
             .SelectMany(Neighbours)
             .Distinct()
@@ -75,6 +106,9 @@ int Simulate(int steps)
 
         visited.UnionWith(toVisit);
     }
+
+    //Console.WriteLine($"{steps}: {visited.Count(p => (p.x + p.y) % 2 == steps % 2)}");
+    //Print(visited.Where(p => (p.x + p.y) % 2 == steps % 2).ToHashSet());
 
     return visited.Count(p => (p.x + p.y) % 2 == steps % 2);
 }
