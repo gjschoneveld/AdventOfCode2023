@@ -8,19 +8,6 @@ var start = FindOfType(input, 'S').First();
 var answer1 = Simulate(64);
 Console.WriteLine($"Answer 1: {answer1}");
 
-//for (int steps = 65; steps < 262 * 50; steps += 262)
-//{
-//    Console.WriteLine($"{steps}: {Simulate(steps)}");
-//    Console.WriteLine($"{steps}: {SimulateMany(steps)}");
-//}
-
-// To test examples
-//foreach (var steps in new List<int> { 6, 10, 50, 100, 500, 1000, 5000 })
-//{
-//    Console.WriteLine($"{steps}: {Simulate(steps)}");
-//    Console.WriteLine($"{steps}: {SimulateMany(steps)}");
-//}
-
 var answer2 = SimulateMany(26501365);
 Console.WriteLine($"Answer 2: {answer2}");
 
@@ -101,8 +88,8 @@ int Simulate(int steps)
 
     for (int i = 0; i < steps; i++)
     {
-        //Console.WriteLine($"{i}: {visited.Count(p => (p.x + p.y) % 2 == i % 2)}");
-        //Print(visited.Where(p => (p.x + p.y) % 2 == i % 2).ToHashSet());
+        //Console.WriteLine($"{i}: {visited.Count(p => Modulo(p.x + p.y, 2) == Modulo(i, 2))}");
+        //Print(visited.Where(p => Modulo(p.x + p.y, 2) == Modulo(i, 2)).ToHashSet());
 
         toVisit = toVisit
             .SelectMany(Neighbours)
@@ -114,10 +101,10 @@ int Simulate(int steps)
         visited.UnionWith(toVisit);
     }
 
-    //Console.WriteLine($"{steps}: {visited.Count(p => (p.x + p.y) % 2 == steps % 2)}");
-    //Print(visited.Where(p => (p.x + p.y) % 2 == steps % 2).ToHashSet());
+    //Console.WriteLine($"{steps}: {visited.Count(p => Modulo(p.x + p.y, 2) == Modulo(steps, 2))}");
+    //Print(visited.Where(p => Modulo(p.x + p.y, 2) == Modulo(steps, 2)).ToHashSet());
 
-    return visited.Count(p => (p.x + p.y) % 2 == steps % 2);
+    return visited.Count(p => Modulo(p.x + p.y, 2) == Modulo(steps, 2));
 }
 
 int Modulo(int x, int mod)
