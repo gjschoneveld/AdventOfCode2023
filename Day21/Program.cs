@@ -1,28 +1,98 @@
 ﻿using Point = (int x, int y);
 
 var input = File.ReadAllLines("input.txt");
+var size = input.Length;
 var rocks = FindOfType(input, '#');
 var start = FindOfType(input, 'S').First();
 
-var toVisit = new List<Point> { start };
-var visited = new HashSet<Point> { start };
+var answer1 = Simulate(64);
+Console.WriteLine($"Answer 1: {answer1}");
 
-var steps = 64;
+List<int> totalSteps = [6, 10, 50, 100, 500, 1000, 5000];// 26501365;
 
-for (int i = 0; i < steps; i++)
+foreach (var steps in totalSteps)
 {
-    toVisit = toVisit
-        .SelectMany(Neighbours)
-        .Distinct()
-        .Where(nb => !rocks.Contains(nb))
-        .Where(nb => !visited.Contains(nb))
-        .ToList();
-
-    visited.UnionWith(toVisit);
+    Console.WriteLine($"{steps}: {SimulateMany(steps)}");
 }
 
-var answer1 = visited.Select(p => p.x + p.y).Where(v => v % 2 == steps % 2).Count();
-Console.WriteLine($"Answer 1: {answer1}");
+long SimulateMany(int steps)
+{
+    // times 2 so it is even resulting in always odd steps being simulated
+    var remainder = steps % (size * 2);
+
+    long value = 0;
+    long increment = 0;
+    long incrementIncrement = 0;
+
+    var index = 0;
+
+    while (index <= steps / (size * 2))
+    {
+        var nextSteps = index * size * 2 + remainder;
+        var nextValue = Simulate(nextSteps);
+
+        var nextIncrement = nextValue - value;
+        var nextIncrementIncrement = nextIncrement - increment;
+
+        if (nextIncrementIncrement == incrementIncrement)
+        {
+            break;
+        }
+
+        value = nextValue;
+        increment = nextIncrement;
+        incrementIncrement = nextIncrementIncrement;
+
+        index++;
+    }
+
+    while (index <= steps / (size * 2))
+    {
+        increment += incrementIncrement;
+        value += increment;
+
+        index++;
+    }
+
+    return value;
+}
+
+int Simulate(int steps)
+{
+    var toVisit = new List<Point> { start };
+    var visited = new HashSet<Point> { start };
+
+    for (int i = 0; i < steps; i++)
+    {
+        toVisit = toVisit
+            .SelectMany(Neighbours)
+            .Distinct()
+            .Where(nb => !rocks.Contains(Normalize(nb)))
+            .Where(nb => !visited.Contains(nb))
+            .ToList();
+
+        visited.UnionWith(toVisit);
+    }
+
+    return visited.Select(p => p.x + p.y).Where(v => v % 2 == steps % 2).Count();
+}
+
+int Modulo(int x, int mod)
+{
+    var result = x % mod;
+
+    if (result < 0)
+    {
+        result += mod;
+    }
+
+    return result;
+}
+
+Point Normalize(Point position)
+{
+    return (Modulo(position.x, size), Modulo(position.y, size));
+}
 
 List<Point> Neighbours(Point position)
 {
