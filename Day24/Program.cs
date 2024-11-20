@@ -1,5 +1,6 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-using Point = (long x, long y, long z);
+﻿using Day24;
+using System.Numerics;
+using Point = (Day24.Quotient x, Day24.Quotient y, Day24.Quotient z);
 
 var input = File.ReadAllLines("input.txt");
 var hailstones = input.Select(FlyingObject.Parse).ToList();
@@ -25,30 +26,37 @@ for (int i = 0; i < hailstones.Count; i++)
 var answer1 = withinBounds;
 Console.WriteLine($"Answer 1: {answer1}");
 
+// doesn't work; way too slow
 //var rock = FindRock(hailstones);
 //var answer2 = rock.Position.x + rock.Position.y + rock.Position.z;
 //Console.WriteLine($"Answer 2: {answer2}");
 
+// should work but is very slow
 //var position = FindRockPosition(hailstones);
 //var answer2 = position.x + position.y + position.z;
 //Console.WriteLine($"Answer 2: {answer2}");
 
+// works
 //var positionA = FindRockPosition2D(hailstones, [Axis.X, Axis.Y]);
 //var positionB = FindRockPosition2D(hailstones, [Axis.X, Axis.Z]);
 //var answer2 = positionA.first + positionA.second + positionB.second;
 //Console.WriteLine($"Answer 2: {answer2}");
+
+// works (fastest)
+// To use the algorithm on the test data add these two points
+// 20, 17, 8 @ -1, -1, 3
+//-4, -1, 45 @ 1, 3, -3 
 
 var positionA = FindRockPosition2D_V2(hailstones, [Axis.X, Axis.Y]);
 var positionB = FindRockPosition2D_V2(hailstones, [Axis.X, Axis.Z]);
 var answer2 = positionA.first + positionA.second + positionB.second;
 Console.WriteLine($"Answer 2: {answer2}");
 
-IEnumerable<long> GetFactors(long x)
+IEnumerable<BigInteger> GetFactors(BigInteger x)
 {
-    var abs = Math.Abs(x);
-    var sqrt = (long)Math.Ceiling(Math.Sqrt(abs));
+    var abs = BigInteger.Abs(x);
 
-    for (long i = 1; i <= sqrt; i++)
+    for (BigInteger i = 1; i * i <= abs; i++)
     {
         if (abs % i == 0)
         {
@@ -106,7 +114,7 @@ Point FindRockPosition(List<FlyingObject> hailstones)
     throw new();
 }
 
-(long first, long second) FindRockPosition2D(List<FlyingObject> hailstones, List<Axis> axes)
+(BigInteger first, BigInteger second) FindRockPosition2D(List<FlyingObject> hailstones, List<Axis> axes)
 {
     foreach (var velocity in GetVelocities2D())
     {
@@ -121,8 +129,9 @@ Point FindRockPosition(List<FlyingObject> hailstones)
     throw new();
 }
 
-(long first, long second) FindRockPosition2D_V2(List<FlyingObject> hailstones, List<Axis> axes)
+(BigInteger first, BigInteger second) FindRockPosition2D_V2(List<FlyingObject> hailstones, List<Axis> axes)
 {
+    // if this line throws an exception you may want to try different axes
     var withSameSpeed = hailstones.GroupBy(h => (GetValue(h.Velocity, axes[0]), GetValue(h.Velocity, axes[1]))).Select(g => g.ToList()).Where(l => l.Count > 1).First();
 
     var diff0 = GetValue(withSameSpeed[0].Position, axes[0]) - GetValue(withSameSpeed[1].Position, axes[0]);
@@ -131,9 +140,9 @@ Point FindRockPosition(List<FlyingObject> hailstones)
     var factors0 = GetFactors(diff0);
     var factors1 = GetFactors(diff1);
 
-    var factors = factors0.Intersect(factors1).SelectMany(f => new List<long> { f, -f }).ToList();
+    var factors = factors0.Intersect(factors1).SelectMany(f => new List<BigInteger> { f, -f }).ToList();
 
-    var velocities = new List<List<long>>();
+    var velocities = new List<List<BigInteger>>();
 
     foreach (var t in factors)
     {
@@ -158,7 +167,7 @@ Point FindRockPosition(List<FlyingObject> hailstones)
 
 IEnumerable<List<int>> GetTimes()
 {
-    var max = 0; // 1002
+    var max = 0;
 
     while (true)
     {
@@ -177,9 +186,9 @@ IEnumerable<List<int>> GetTimes()
     }
 }
 
-IEnumerable<List<long>> GetVelocities2D()
+IEnumerable<List<BigInteger>> GetVelocities2D()
 {
-    var max = 0; // 10320
+    var max = 0;
 
     while (true)
     {
@@ -202,7 +211,7 @@ IEnumerable<List<long>> GetVelocities2D()
 
 IEnumerable<Point> GetVelocities()
 {
-    var max = 0; // 565
+    var max = 0;
 
     while (true)
     {
@@ -244,10 +253,7 @@ bool IntersectsAll(List<FlyingObject> hailstones, FlyingObject rock)
     {
         var intersection = FindIntersection3D(hailstone, rock);
 
-        if (intersection == null ||
-            !IsInteger(intersection.Value.x) ||
-            !IsInteger(intersection.Value.y) ||
-            !IsInteger(intersection.Value.z))
+        if (intersection == null)
         {
             return false;
         }
@@ -256,12 +262,12 @@ bool IntersectsAll(List<FlyingObject> hailstones, FlyingObject rock)
     return true;
 }
 
-bool WithinBounds1D(double value, double minimum, double maximum)
+bool WithinBounds1D(Quotient value, Quotient minimum, Quotient maximum)
 {
     return minimum <= value && value <= maximum; 
 }
 
-bool WithinBounds2D(Point position, double minimum, double maximum)
+bool WithinBounds2D(Point position, Quotient minimum, Quotient maximum)
 {
     return WithinBounds1D(position.x, minimum, maximum) &&
         WithinBounds1D(position.y, minimum, maximum);
@@ -272,167 +278,149 @@ Point Add(Point a, Point b)
     return (a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-Point Multiply(Point a, long scalar)
+Point Multiply(Point a, Quotient scalar)
 {
     return (scalar * a.x, scalar * a.y, scalar * a.z);
 }
 
 Point? FindIntersection2D(FlyingObject a, FlyingObject b)
 {
-    var matrix = Matrix<double>.Build.DenseOfArray(new double[,] {
+    var matrix = new Quotient[,] {
         { a.Velocity.x, -b.Velocity.x },
         { a.Velocity.y, -b.Velocity.y }
-    });
+    };
 
-    var result = Vector<double>.Build.Dense([
+    var result = new Quotient[] {
         b.Position.x - a.Position.x,
         b.Position.y - a.Position.y
-    ]);
+    };
 
-    var parameters = matrix.Solve(result);
+    var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !double.IsFinite(p) || p < 0))
+    if (parameters.Any(p => !p.IsFinite || p.IsNegative))
     {
         return null;
     }
 
-    return Add(a.Position, Multiply(a.Velocity, (long)Math.Round(parameters[0])));
+    return Add(a.Position, Multiply(a.Velocity, parameters[0]));
 }
 
 Point? FindIntersection3D(FlyingObject a, FlyingObject b)
 {
-    var matrix = Matrix<double>.Build.DenseOfArray(new double[,] {
+    var matrix = new Quotient[,] {
         { a.Velocity.x, -b.Velocity.x },
         { a.Velocity.y, -b.Velocity.y },
         { a.Velocity.z, -b.Velocity.z }
-    });
+    };
 
-    var result = Vector<double>.Build.Dense([
+    var result = new Quotient[] {
         b.Position.x - a.Position.x,
         b.Position.y - a.Position.y,
         b.Position.z - a.Position.z,
-    ]);
+    };
 
-    var parameters = matrix.Solve(result);
+    var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !double.IsFinite(p) || p < 0))
+    if (parameters.Any(p => !p.IsFinite || p.IsNegative))
     {
         return null;
     }
 
-    return Add(a.Position, Multiply(a.Velocity, (long)Math.Round(parameters[0])));
-}
-
-bool IsInteger(double value)
-{
-    if (!double.IsFinite(value))
-    {
-        return false;
-    }
-
-    var rounded = Math.Round(value);
-
-    return Math.Abs(value - rounded) < 1e-3;
+    return Add(a.Position, Multiply(a.Velocity, parameters[0]));
 }
 
 FlyingObject? FindRockCandidate(List<FlyingObject> hailstones, List<int> times)
 {
-    var matrix = Matrix<double>.Build.DenseOfArray(new double[,] {
+    var matrix = new Quotient[,] {
         { times[0], 0, 0, 1, 0, 0 },
         { 0, times[0], 0, 0, 1, 0 },
         { 0, 0, times[0], 0, 0, 1 },
         { 1, 0, 0, times[1], 0, 0 },
         { 0, 1, 0, 0, times[1], 0 },
         { 0, 0, 1, 0, 0, times[1] },
-    });
+    };
 
-    var result = Vector<double>.Build.Dense([
+    var result = new Quotient[] {
         hailstones[0].Position.x + times[0] * hailstones[0].Velocity.x,
         hailstones[0].Position.y + times[0] * hailstones[0].Velocity.y,
         hailstones[0].Position.z + times[0] * hailstones[0].Velocity.z,
         hailstones[1].Position.x + times[1] * hailstones[1].Velocity.x,
         hailstones[1].Position.y + times[1] * hailstones[1].Velocity.y,
         hailstones[1].Position.z + times[1] * hailstones[1].Velocity.z,
-    ]);
+    };
 
-    var parameters = matrix.Solve(result);
+    var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !IsInteger(p)))
+    if (parameters.Any(p => !p.IsInteger))
     {
         return null;
     }
 
     return new()
     {
-        Position = ((long)Math.Round(parameters[0]), (long)Math.Round(parameters[1]), (long)Math.Round(parameters[2])),
-        Velocity = ((long)Math.Round(parameters[3]), (long)Math.Round(parameters[4]), (long)Math.Round(parameters[5]))
+        Position = (parameters[0], parameters[1], parameters[2]),
+        Velocity = (parameters[3], parameters[4], parameters[5])
     };
 }
 
 Point? FindPosition(List<FlyingObject> hailstones, Point velocity)
 {
-    var matrixData = new double[hailstones.Count * 3, hailstones.Count + 3];
-    var resultData = new double[hailstones.Count * 3];
+    var matrix = Quotient.ZeroMatrix(hailstones.Count * 3, hailstones.Count + 3);
+    var result = new Quotient[hailstones.Count * 3];
 
     for (var i = 0; i < hailstones.Count; i++)
     {
-        matrixData[i * 3, 0] = 1;
-        matrixData[i * 3 + 1, 1] = 1;
-        matrixData[i * 3 + 2, 2] = 1;
+        matrix[i * 3, 0] = 1;
+        matrix[i * 3 + 1, 1] = 1;
+        matrix[i * 3 + 2, 2] = 1;
 
-        matrixData[i * 3, 3 + i] = velocity.x - hailstones[i].Velocity.x;
-        matrixData[i * 3 + 1, 3 + i] = velocity.y - hailstones[i].Velocity.y;
-        matrixData[i * 3 + 2, 3 + i] = velocity.z - hailstones[i].Velocity.z;
+        matrix[i * 3, 3 + i] = velocity.x - hailstones[i].Velocity.x;
+        matrix[i * 3 + 1, 3 + i] = velocity.y - hailstones[i].Velocity.y;
+        matrix[i * 3 + 2, 3 + i] = velocity.z - hailstones[i].Velocity.z;
 
-        resultData[i * 3] = hailstones[i].Position.x;
-        resultData[i * 3 + 1] = hailstones[i].Position.y;
-        resultData[i * 3 + 2] = hailstones[i].Position.z;
+        result[i * 3] = hailstones[i].Position.x;
+        result[i * 3 + 1] = hailstones[i].Position.y;
+        result[i * 3 + 2] = hailstones[i].Position.z;
     }
 
-    var matrix = Matrix<double>.Build.DenseOfArray(matrixData);
-    var result = Vector<double>.Build.Dense(resultData);
+    var parameters = Solver.Solve(matrix, result);
 
-    var parameters = matrix.Solve(result);
-
-    if (parameters.Any(p => !IsInteger(p)))
+    if (parameters.Any(p => !p.IsInteger))
     {
         return null;
     }
 
-    return ((long)Math.Round(parameters[0]), (long)Math.Round(parameters[1]), (long)Math.Round(parameters[2]));
+    return (parameters[0], parameters[1], parameters[2]);
 }
 
-(long first, long second)? FindPosition2D(List<FlyingObject> hailstones, List<long> velocities, List<Axis> axes)
+(BigInteger first, BigInteger second)? FindPosition2D(List<FlyingObject> hailstones, List<BigInteger> velocities, List<Axis> axes)
 {
-    var matrixData = new double[hailstones.Count * 2, hailstones.Count + 2];
-    var resultData = new double[hailstones.Count * 2];
+    var matrix = Quotient.ZeroMatrix(hailstones.Count * 2, hailstones.Count + 2);
+    var result = new Quotient[hailstones.Count * 2];
 
     for (var i = 0; i < hailstones.Count; i++)
     {
-        matrixData[i * 2, 0] = 1;
-        matrixData[i * 2 + 1, 1] = 1;
+        matrix[i * 2, 0] = 1;
+        matrix[i * 2 + 1, 1] = 1;
 
-        matrixData[i * 2, 2 + i] = velocities[0] - GetValue(hailstones[i].Velocity, axes[0]);
-        matrixData[i * 2 + 1, 2 + i] = velocities[1] - GetValue(hailstones[i].Velocity, axes[1]);
+        matrix[i * 2, 2 + i] = velocities[0] - GetValue(hailstones[i].Velocity, axes[0]);
+        matrix[i * 2 + 1, 2 + i] = velocities[1] - GetValue(hailstones[i].Velocity, axes[1]);
 
-        resultData[i * 2] = GetValue(hailstones[i].Position, axes[0]);
-        resultData[i * 2 + 1] = GetValue(hailstones[i].Position, axes[1]);
+        result[i * 2] = GetValue(hailstones[i].Position, axes[0]);
+        result[i * 2 + 1] = GetValue(hailstones[i].Position, axes[1]);
     }
 
-    var matrix = Matrix<double>.Build.DenseOfArray(matrixData);
-    var result = Vector<double>.Build.Dense(resultData);
+    var parameters = Solver.Solve(matrix, result);
 
-    var parameters = matrix.Solve(result);
-
-    if (parameters.Any(p => !IsInteger(p)))
+    if (parameters.Any(p => !p.IsInteger))
     {
         return null;
     }
 
-    return ((long)Math.Round(parameters[0]), (long)Math.Round(parameters[1]));
+    return (parameters[0], parameters[1]);
 }
 
-long GetValue(Point position, Axis axis)
+BigInteger GetValue(Point position, Axis axis)
 {
     return axis switch
     {
