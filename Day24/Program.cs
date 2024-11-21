@@ -297,7 +297,7 @@ Point? FindIntersection2D(FlyingObject a, FlyingObject b)
 
     var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !p.IsFinite || p.IsNegative))
+    if (parameters == null || parameters.Any(p => !p.IsFinite || p.IsNegative))
     {
         return null;
     }
@@ -321,7 +321,7 @@ Point? FindIntersection3D(FlyingObject a, FlyingObject b)
 
     var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !p.IsFinite || p.IsNegative))
+    if (parameters == null || parameters.Any(p => !p.IsFinite || p.IsNegative))
     {
         return null;
     }
@@ -351,7 +351,7 @@ FlyingObject? FindRockCandidate(List<FlyingObject> hailstones, List<int> times)
 
     var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !p.IsInteger))
+    if (parameters == null || parameters.Any(p => !p.IsInteger))
     {
         return null;
     }
@@ -385,7 +385,7 @@ Point? FindPosition(List<FlyingObject> hailstones, Point velocity)
 
     var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !p.IsInteger))
+    if (parameters == null || parameters.Any(p => !p.IsInteger))
     {
         return null;
     }
@@ -412,7 +412,7 @@ Point? FindPosition(List<FlyingObject> hailstones, Point velocity)
 
     var parameters = Solver.Solve(matrix, result);
 
-    if (parameters.Any(p => !p.IsInteger))
+    if (parameters == null || parameters.Any(p => !p.IsInteger))
     {
         return null;
     }

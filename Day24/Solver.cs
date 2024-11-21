@@ -8,7 +8,7 @@ namespace Day24;
 
 public class Solver
 {
-    public static Quotient[] Solve(Quotient[,] coefficients, Quotient[] result)
+    public static Quotient[]? Solve(Quotient[,] coefficients, Quotient[] result)
     {
         // Combine coefficients and result in an augmented matrix
         Quotient[,] augmentedMatrix = new Quotient[coefficients.GetLength(0), coefficients.GetLength(1) + 1];
@@ -83,6 +83,18 @@ public class Solver
             // Move to next row/column 
             currentRow++;
             currentColumn++;
+        }
+
+        // Check that result of remaining rows is zero
+        while (currentRow < augmentedMatrix.GetLength(0))
+        {
+            if (!augmentedMatrix[currentRow, augmentedMatrix.GetLength(1) - 1].IsZero)
+            {
+                // The system has no solutions
+                return null;
+            }
+
+            currentRow++;
         }
 
         // Create reduced echelon
